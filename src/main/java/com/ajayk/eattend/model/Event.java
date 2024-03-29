@@ -1,14 +1,17 @@
 package com.ajayk.eattend.model;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Table(name = "event", schema="devldb")
+@Data
 public class Event {
 	
 	@Id
@@ -16,6 +19,10 @@ public class Event {
 	@Column(name = "descr")
 	private String descr;	
 	@Column(name = "event_date")
-	private Date eventDate;
+	private LocalDate eventDate;
+	@Column(name = "created_at")
+	private LocalDateTime createdAt;
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
 
 }

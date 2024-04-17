@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ajayk.eattend.dto.StatusObject;
 import com.ajayk.eattend.model.EmployeeRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class EmployeeController {

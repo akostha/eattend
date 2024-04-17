@@ -24,5 +24,7 @@ public class Contact {
 	private String email;
 	@Column(name = "phone")
 	private String phoneNo;
+	@Column(name = "event_id")
+	private int eventId;
 
 }

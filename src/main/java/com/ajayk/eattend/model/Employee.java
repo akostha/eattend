@@ -1,6 +1,8 @@
 package com.ajayk.eattend.model;
 
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -20,9 +22,11 @@ public class Employee {
 	private int salary;
 	@Column(name = "dept")
 	private String dept;
+	@Column(name = "createdat")
+	private LocalDateTime createdAt;
 	
 	public Employee() {
-		//this.createdAt = new Date();
+		this.createdAt = LocalDateTime.now();
 	}
 	
 	public Employee(int id, String firstName, String lastName, int salary, String dept) {
@@ -32,7 +36,7 @@ public class Employee {
 		this.lastName = lastName;
 		this.salary = salary;
 		this.dept = dept;
-		//this.createdAt = new Date();
+		this.createdAt = LocalDateTime.now();
 	}
 	
 	public String getFirstName() {

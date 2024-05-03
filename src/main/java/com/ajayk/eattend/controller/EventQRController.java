@@ -34,4 +34,17 @@ public class EventQRController {
 		return response.ok(statusObject);
 		
 	}
+	
+	@PostMapping("/testqrcode")
+	public ResponseEntity<StatusObject> createTestQRCode(@RequestBody QRCodeRequest body) throws WriterException, IOException{		
+		qrcodeService.createTestQRCode(body);
+		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
+		StatusObject statusObject = new StatusObject.Builder()
+		        .setMessage("Success")
+		        .setHttpStatus(HttpStatus.OK.value())
+		        //.setData(eventRepository.findAll())
+		        .build();
+		return response.ok(statusObject);
+		
+	}
 }

@@ -4,12 +4,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -55,7 +54,7 @@ public class QRCodeService {
 		Optional<Event> obj = eventRepository.findById(Long.valueOf(qrcodeRequest.getEventid()));
 		List<Contact> contacts =  contactRepository.findByEventId(qrcodeRequest.getEventid());
 		
-		if(obj.isPresent() && !contacts.isEmpty()) {			
+		if(obj.isPresent() && !contacts.isEmpty()) {
 			for (Contact element : contacts) {
 				Event event  = obj.get();
 				String msg = event.getDescr() + " at " + event.getEventDate();
@@ -67,6 +66,53 @@ public class QRCodeService {
 		}
 	}
 	
+	public void createTestQRCode(QRCodeRequest qrcodeRequest) throws WriterException, IOException {
+		
+		Optional<Event> obj = eventRepository.findById(Long.valueOf(qrcodeRequest.getEventid()));
+		List<Contact> contacts =  contactRepository.findByEventId(qrcodeRequest.getEventid());
+		String basePath = "C:\\devl\\copeland";
+		String data = obj.isPresent() ? obj.get().toString() : "Invalid Event";
+		BufferedImage bg1 = ImageIO.read(new File(basePath+"\\bg1.jpg")); //525x350
+		
+		QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, 200, 200);
+        BufferedImage qrcodeImg = MatrixToImageWriter.toBufferedImage(bitMatrix);
+		
+        BufferedImage resultImages = overlayImages(bg1, qrcodeImg, 50, 50);
+        ImageIO.write(resultImages, "PNG", new File(basePath+"\\final.jpg"));
+		
+	}
+	
+	private BufferedImage overlayImages(BufferedImage baseImage, BufferedImage topImage, int dx, int dy) {
+        // Create a new BufferedImage with transparency
+        BufferedImage resultImage = new BufferedImage(
+            baseImage.getWidth(), baseImage.getHeight(), BufferedImage.TYPE_INT_ARGB
+        );
+
+        //calculate 
+        int[] pos = getQRCodeCord(baseImage.getWidth(), baseImage.getHeight(),topImage.getWidth(),topImage.getHeight());
+        
+        // Get the Graphics2D context
+        Graphics2D g2d = resultImage.createGraphics();
+
+        // Draw the base image
+        g2d.drawImage(baseImage, 0, 0, null);
+
+        // Draw the top image (with transparency)
+        g2d.drawImage(topImage, pos[0], pos[1], null);
+
+        // Dispose of the Graphics2D context
+        g2d.dispose();
+
+        return resultImage;
+    }
+	
+	private int[] getQRCodeCord(int bix, int biy, int qrx, int qry) {
+		int[] pos = new int[2];		
+		int posy = (biy-qry)/2;		
+		return new int[]{posy,posy};
+	}
+
 	private void createQRImage(String data, String[] textMsgs, String imgPath, int width, int height) throws WriterException, IOException {
 		try {
 	        QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -99,8 +145,7 @@ public class QRCodeService {
 	            ImageIO.write(outputImage, "PNG", new File(imgPath));
 	            //baos.flush();
 	            //pngData = baos.toByteArray();
-	            //baos.close();
-	            
+	            //baos.close();	            
 	        }	        
 	    } catch (WriterException | IOException ex) {
 	       ex.printStackTrace();

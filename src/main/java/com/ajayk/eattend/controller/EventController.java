@@ -1,8 +1,6 @@
 package com.ajayk.eattend.controller;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,17 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ajayk.eattend.dto.StatusObject;
+import com.ajayk.eattend.model.Contact;
 import com.ajayk.eattend.model.Event;
-import com.ajayk.eattend.model.EventRepository;
 import com.ajayk.eattend.service.EventService;
 import com.ajayk.eattend.service.QRCodeService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/event")
 public class EventController {
-	
-	@Autowired
-	EventRepository eventRepository;
 	
 	@Autowired
 	EventService eventService;
@@ -36,18 +31,29 @@ public class EventController {
 	@Autowired
 	QRCodeService qrcodeService;
 	
-	@GetMapping("/event")
-	public ResponseEntity<StatusObject> getEmployees() {
+	@GetMapping
+	public ResponseEntity<StatusObject> getEvents() {
 		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		StatusObject statusObject = new StatusObject.Builder()
 		        .setMessage("Success")
 		        .setHttpStatus(HttpStatus.OK.value())
-		        .setData(eventRepository.findAll())
+		        .setData(eventService.getAllEvents())
 		        .build();
 		return response.ok(statusObject);
 	}
 	
-	@PostMapping("/event")
+	@GetMapping("/{eventId}/getContacts")
+	public ResponseEntity<StatusObject> getContactByEventId(@PathVariable Integer eventId) {
+		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
+		StatusObject statusObject = new StatusObject.Builder()
+		        .setMessage("Success")
+		        .setHttpStatus(HttpStatus.OK.value())
+		        .setData(eventService.getContactsByEventId(eventId))
+		        .build();
+		return response.ok(statusObject);
+	}
+	
+	@PostMapping
 	public ResponseEntity<StatusObject> createEvent(@RequestBody Event event){		
 		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		if(ObjectUtils.isEmpty(event)) {
@@ -60,14 +66,14 @@ public class EventController {
 			StatusObject statusObject = new StatusObject.Builder()
 			        .setMessage("Success")
 			        .setHttpStatus(HttpStatus.OK.value())
-			        .setData(eventRepository.save(event))
+			        .setData(eventService.saveEvent(event))
 			        .build();
 			return response.ok(statusObject);
 		}		
 	}
 	
-	@PostMapping("/event/{eventId}/addContacts")
-	public ResponseEntity<StatusObject> addContacts(@PathVariable Integer eventId, @RequestParam("file") MultipartFile datafile)
+	@PostMapping("/{eventId}/importContacts")
+	public ResponseEntity<StatusObject> importContacts(@PathVariable Integer eventId, @RequestParam("file") MultipartFile datafile)
 		throws IOException{		
 		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		if(ObjectUtils.isEmpty(eventId)) {
@@ -93,5 +99,35 @@ public class EventController {
 		}		
 	}
 	
+	@PostMapping("/{eventId}/addContact")
+	public ResponseEntity<StatusObject> addContacts(@PathVariable Integer eventId, @RequestBody Contact contact)
+		throws IOException{		
+		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
+		if(ObjectUtils.isEmpty(contact)) {
+			StatusObject statusObject = new StatusObject.Builder()
+			        .setMessage("Contact data not available")
+			        .setHttpStatus(HttpStatus.OK.value())
+			        .build();
+			return response.ok(statusObject);
+		}else {
+			contact.setEventId(eventId);
+			Contact dbObject = eventService.addContact(contact);
+			if(ObjectUtils.isEmpty(dbObject)) {
+				StatusObject statusObject = new StatusObject.Builder()
+				        .setMessage("Object not saved.")
+				        .setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY.value())
+				        .build();
+				return response.ok(statusObject);
+			}else {
+				StatusObject statusObject = new StatusObject.Builder()
+				        .setMessage("Success")
+				        .setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY.value())
+				        .setData(dbObject)
+				        .build();
+				return response.ok(statusObject);
+			}
+			
+		}		
+	}
 	
 }

@@ -15,7 +15,7 @@ public class Contact {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@Column(name = "first_name")
 	private String firstName;
 	@Column(name = "last_name")
@@ -25,6 +25,6 @@ public class Contact {
 	@Column(name = "phone")
 	private String phoneNo;
 	@Column(name = "event_id")
-	private int eventId;
+	private Integer eventId;
 
 }

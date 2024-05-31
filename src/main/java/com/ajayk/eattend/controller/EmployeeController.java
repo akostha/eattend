@@ -25,7 +25,7 @@ public class EmployeeController {
 		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		StatusObject statusObject = new StatusObject.Builder()
 		        .setMessage("Success")
-		        .setHttpStatus(HttpStatus.OK.value())
+		        .setHttpStatus(HttpStatus.OK)
 		        .setData(empRepository.findAll())
 		        .build();
 		return response.ok(statusObject);

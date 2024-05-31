@@ -20,9 +20,14 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ajayk.eattend.dto.QRCodeRequest;
+import com.ajayk.eattend.dto.StatusObject;
 import com.ajayk.eattend.model.Contact;
 import com.ajayk.eattend.model.ContactRepository;
 import com.ajayk.eattend.model.Event;
@@ -34,7 +39,11 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+
 @Service
+@Slf4j
 public class QRCodeService {
 	
 	@Autowired
@@ -46,13 +55,29 @@ public class QRCodeService {
 	@Autowired
 	ImagePathService pathService;
 	
+	@Value("${service.qrservice.url}")
+	String qrserviceUrl;
+	
 	private int imageWidth = 400;
 	private int imageHeight = 300;
 	
+	public Mono<StatusObject> callQRCodeService(QRCodeRequest qrcodeRequest) {
+		log.info("Method {} is called", "QRCodeService.createQrCode");
+		Mono<StatusObject> result =  getQrServiceClient().post()
+                .uri("/api/qrservice/qrcode") // Set the request URI
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .body(Mono.just(qrcodeRequest), QRCodeRequest.class) // Set the request body
+                .retrieve() 
+                .bodyToMono(StatusObject.class); // Retrieve the response body
+		result.subscribe();
+		return result;
+    }
+	
+	
 	public void createQRCode(QRCodeRequest qrcodeRequest) throws WriterException, IOException {
 		
-		Optional<Event> obj = eventRepository.findById(Long.valueOf(qrcodeRequest.getEventid()));
-		List<Contact> contacts =  contactRepository.findByEventId(qrcodeRequest.getEventid());
+		Optional<Event> obj = eventRepository.findById(Long.valueOf(qrcodeRequest.getEvent().getId()));
+		List<Contact> contacts =  contactRepository.findByEventId(qrcodeRequest.getEvent().getId());
 		
 		if(obj.isPresent() && !contacts.isEmpty()) {
 			for (Contact element : contacts) {
@@ -68,8 +93,8 @@ public class QRCodeService {
 	
 	public void createTestQRCode(QRCodeRequest qrcodeRequest) throws WriterException, IOException {
 		
-		Optional<Event> obj = eventRepository.findById(Long.valueOf(qrcodeRequest.getEventid()));
-		List<Contact> contacts =  contactRepository.findByEventId(qrcodeRequest.getEventid());
+		Optional<Event> obj = eventRepository.findById(Long.valueOf(qrcodeRequest.getEvent().getId()));
+		List<Contact> contacts =  contactRepository.findByEventId(qrcodeRequest.getEvent().getId());
 		String basePath = "C:\\devl\\copeland";
 		String data = obj.isPresent() ? obj.get().toString() : "Invalid Event";
 		BufferedImage bg1 = ImageIO.read(new File(basePath+"\\bg1.jpg")); //525x350
@@ -184,4 +209,12 @@ public class QRCodeService {
         return pngData;
     }
 	*/
+	
+	private WebClient getQrServiceClient() {
+	    return WebClient.builder()
+                .baseUrl(qrserviceUrl) // Set the base URL
+                .defaultCookie("cookie-name", "cookie-value") // Set default cookies
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) // Set default headers
+                .build();	    
+	}
 }

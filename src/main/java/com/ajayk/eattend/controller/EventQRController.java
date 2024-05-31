@@ -15,36 +15,63 @@ import com.ajayk.eattend.dto.StatusObject;
 import com.ajayk.eattend.service.QRCodeService;
 import com.google.zxing.WriterException;
 
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/eattend")
+@Slf4j
 public class EventQRController {
 	
 	@Autowired
 	QRCodeService qrcodeService;
 	
 	@PostMapping("/qrcode")
-	public ResponseEntity<StatusObject> createQrCode(@RequestBody QRCodeRequest body) throws WriterException, IOException{		
-		qrcodeService.createQRCode(body);
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
-		StatusObject statusObject = new StatusObject.Builder()
-		        .setMessage("Success")
-		        .setHttpStatus(HttpStatus.OK.value())
-		        //.setData(eventRepository.findAll())
+	public Mono<StatusObject> createQrCode(@RequestBody QRCodeRequest body) throws WriterException, IOException{
+		log.info("Method {} is called", "EventQRController.createQrCode");		
+		Mono<StatusObject> result = qrcodeService.callQRCodeService(body);
+		/*
+		final ResponseEntity<Mono<StatusObject>> rEntity = new ResponseEntity<Mono<StatusObject>>(HttpStatus.OK);
+		result.subscribe(elem -> {
+			StatusObject statusObject = new StatusObject.Builder()
+		        .setHttpStatus(HttpStatus.OK)
+		        .setData(elem.getData())
 		        .build();
-		return response.ok(statusObject);
+			rEntity.ok(statusObject);
+				},
+			    error -> {
+			        log.error(error.getStackTrace().toString());
+			        StatusObject statusObject = new StatusObject.Builder()
+					        .setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+					        .setMessage(error.getMessage())
+					        .build();
+						rEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
+			    },
+			    () -> {
+			        // Handle completion (optional)
+			    	StatusObject statusObject = new StatusObject.Builder()
+					        .setHttpStatus(HttpStatus.OK)
+					        .setMessage("No data Found")
+					        .build();
+						rEntity.ok(statusObject);
+						log.info("Completed without a value");
+			    }
+	     	);
+	     	*/
+		return result;
 		
 	}
 	
 	@PostMapping("/testqrcode")
-	public ResponseEntity<StatusObject> createTestQRCode(@RequestBody QRCodeRequest body) throws WriterException, IOException{		
+	public ResponseEntity<StatusObject> createTestQRCode(@RequestBody QRCodeRequest body) throws WriterException, IOException{	
+		log.info("Method {} is called", "EventQRController.createTestQRCode");
 		qrcodeService.createTestQRCode(body);
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		StatusObject statusObject = new StatusObject.Builder()
 		        .setMessage("Success")
-		        .setHttpStatus(HttpStatus.OK.value())
+		        .setHttpStatus(HttpStatus.OK)
 		        //.setData(eventRepository.findAll())
 		        .build();
-		return response.ok(statusObject);
+		return ResponseEntity.ok(statusObject);
 		
 	}
 }

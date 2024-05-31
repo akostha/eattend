@@ -22,7 +22,7 @@ import com.ajayk.eattend.service.EventService;
 import com.ajayk.eattend.service.QRCodeService;
 
 @RestController
-@RequestMapping("/api/event")
+@RequestMapping("/api/eattend/events")
 public class EventController {
 	
 	@Autowired
@@ -33,98 +33,93 @@ public class EventController {
 	
 	@GetMapping
 	public ResponseEntity<StatusObject> getEvents() {
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		StatusObject statusObject = new StatusObject.Builder()
 		        .setMessage("Success")
-		        .setHttpStatus(HttpStatus.OK.value())
+		        .setHttpStatus(HttpStatus.OK)
 		        .setData(eventService.getAllEvents())
 		        .build();
-		return response.ok(statusObject);
+		return ResponseEntity.ok(statusObject);
 	}
 	
 	@GetMapping("/{eventId}/getContacts")
 	public ResponseEntity<StatusObject> getContactByEventId(@PathVariable Integer eventId) {
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		StatusObject statusObject = new StatusObject.Builder()
 		        .setMessage("Success")
-		        .setHttpStatus(HttpStatus.OK.value())
+		        .setHttpStatus(HttpStatus.OK)
 		        .setData(eventService.getContactsByEventId(eventId))
 		        .build();
-		return response.ok(statusObject);
+		return ResponseEntity.ok(statusObject);
 	}
 	
 	@PostMapping
 	public ResponseEntity<StatusObject> createEvent(@RequestBody Event event){		
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		if(ObjectUtils.isEmpty(event)) {
 			StatusObject statusObject = new StatusObject.Builder()
 			        .setMessage("Event data not available")
-			        .setHttpStatus(HttpStatus.OK.value())
+			        .setHttpStatus(HttpStatus.OK)
 			        .build();
-			return response.ok(statusObject);
+			return ResponseEntity.ok(statusObject);
 		}else {
 			StatusObject statusObject = new StatusObject.Builder()
 			        .setMessage("Success")
-			        .setHttpStatus(HttpStatus.OK.value())
+			        .setHttpStatus(HttpStatus.OK)
 			        .setData(eventService.saveEvent(event))
 			        .build();
-			return response.ok(statusObject);
+			return ResponseEntity.ok(statusObject);
 		}		
 	}
 	
 	@PostMapping("/{eventId}/importContacts")
 	public ResponseEntity<StatusObject> importContacts(@PathVariable Integer eventId, @RequestParam("file") MultipartFile datafile)
 		throws IOException{		
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		if(ObjectUtils.isEmpty(eventId)) {
 			StatusObject statusObject = new StatusObject.Builder()
 			        .setMessage("Event data not available")
-			        .setHttpStatus(HttpStatus.OK.value())
+			        .setHttpStatus(HttpStatus.OK)
 			        .build();
-			return response.ok(statusObject);
+			return ResponseEntity.ok(statusObject);
 		}else if(!datafile.getContentType().equals("text/csv")) {
 			StatusObject statusObject = new StatusObject.Builder()
 			        .setMessage("File is not a csv  file.")
-			        .setHttpStatus(HttpStatus.OK.value())
+			        .setHttpStatus(HttpStatus.OK)
 			        .build();
-			return response.ok(statusObject);
+			return ResponseEntity.ok(statusObject);
 		}
 		else {
 			eventService.processCsvFile(datafile, eventId);
 			StatusObject statusObject = new StatusObject.Builder()
 			        .setMessage("Success")
-			        .setHttpStatus(HttpStatus.OK.value())
+			        .setHttpStatus(HttpStatus.OK)
 			        .build();
-			return response.ok(statusObject);
+			return ResponseEntity.ok(statusObject);
 		}		
 	}
 	
 	@PostMapping("/{eventId}/addContact")
 	public ResponseEntity<StatusObject> addContacts(@PathVariable Integer eventId, @RequestBody Contact contact)
 		throws IOException{		
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		if(ObjectUtils.isEmpty(contact)) {
 			StatusObject statusObject = new StatusObject.Builder()
 			        .setMessage("Contact data not available")
-			        .setHttpStatus(HttpStatus.OK.value())
+			        .setHttpStatus(HttpStatus.OK)
 			        .build();
-			return response.ok(statusObject);
+			return ResponseEntity.ok(statusObject);
 		}else {
 			contact.setEventId(eventId);
 			Contact dbObject = eventService.addContact(contact);
 			if(ObjectUtils.isEmpty(dbObject)) {
 				StatusObject statusObject = new StatusObject.Builder()
 				        .setMessage("Object not saved.")
-				        .setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY.value())
+				        .setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 				        .build();
-				return response.ok(statusObject);
+				return ResponseEntity.ok(statusObject);
 			}else {
 				StatusObject statusObject = new StatusObject.Builder()
 				        .setMessage("Success")
-				        .setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY.value())
+				        .setHttpStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 				        .setData(dbObject)
 				        .build();
-				return response.ok(statusObject);
+				return ResponseEntity.ok(statusObject);
 			}
 			
 		}		

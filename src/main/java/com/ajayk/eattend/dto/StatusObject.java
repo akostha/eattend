@@ -3,6 +3,8 @@ package com.ajayk.eattend.dto;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class StatusObject implements Serializable {
     private String message;
     private String[] errors;
-    private int httpStatus;
+    private HttpStatus httpStatus;
     private Object data;
 
     // Private constructor to prevent direct instantiation
@@ -26,7 +28,7 @@ public class StatusObject implements Serializable {
     public static class Builder {
         private String message;
         private String[] errors;
-        private int httpStatus;
+        private HttpStatus httpStatus;
         private Object data;
 
         public Builder() {
@@ -43,7 +45,7 @@ public class StatusObject implements Serializable {
             return this;
         }
 
-        public Builder setHttpStatus(int httpStatus) {
+        public Builder setHttpStatus(HttpStatus httpStatus) {
             this.httpStatus = httpStatus;
             return this;
         }
@@ -62,17 +64,25 @@ public class StatusObject implements Serializable {
     public String getMessage() {
         return message;
     }
+    
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public String[] getErrors() {
         return errors;
     }
 
-    public int getHttpStatus() {
+    public HttpStatus getHttpStatus() {
         return httpStatus;
     }
 
     public Object getData() {
         return data;
+    }
+    
+    public void setData(Object data) {
+        this.data = data;
     }
 
     @Override

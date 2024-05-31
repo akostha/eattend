@@ -25,25 +25,23 @@ public class ContactController {
 	
 	@GetMapping("/contact")
 	public ResponseEntity<StatusObject> getEmployees() {
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		StatusObject statusObject = new StatusObject.Builder()
 		        .setMessage("Success")
-		        .setHttpStatus(HttpStatus.OK.value())
+		        .setHttpStatus(HttpStatus.OK)
 		        .setData(contactRepository.findAll())
 		        .build();
-		return response.ok(statusObject);
+		return ResponseEntity.ok(statusObject);
 	}
 	
 	@PostMapping("/contact")
 	public ResponseEntity<StatusObject> createContact(@RequestBody Contact body) {
 		Contact object = contactRepository.save(body);
 		
-		ResponseEntity response = new ResponseEntity(HttpStatus.OK);
 		StatusObject statusObject = new StatusObject.Builder()
 		        .setMessage("Success")
-		        .setHttpStatus(HttpStatus.OK.value())
+		        .setHttpStatus(HttpStatus.OK)
 		        .setData(object.getId())
 		        .build();
-		return response.ok(statusObject);
+		return ResponseEntity.ok(statusObject);
 	}
 }

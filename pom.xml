@@ -9,12 +9,14 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ajayk</groupId>
-	<artifactId>eattend</artifactId>
+	<artifactId>eventservice</artifactId>
 	<version>0.0.1</version>
-	<name>eattend</name>
+	<name>eventservice</name>
 	<description>Digital Events</description>
 	<properties>
 		<java.version>17</java.version>
+		<docker.image.prefix>ajaykcrs.azurecr.io</docker.image.prefix>
+   		<jib-maven-plugin.version>3.3.2</jib-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -79,6 +81,19 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+			  <artifactId>jib-maven-plugin</artifactId>
+			  <groupId>com.google.cloud.tools</groupId>
+			  <version>${jib-maven-plugin.version}</version>
+			  <configuration>
+			     <from>
+			         <image>mcr.microsoft.com/openjdk/jdk:17-ubuntu</image>
+			     </from>
+			     <to>
+			         <image>${docker.image.prefix}/eventservice-docker</image>
+			     </to>
+			  </configuration>
 			</plugin>
 		</plugins>
 	</build>

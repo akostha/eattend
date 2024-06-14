@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "contact", schema="devldb")
+@Table(name = "contact", schema="eventsdb")
 public class Contact {
 	
 	@Id

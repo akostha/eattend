@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "event", schema="devldb")
+@Table(name = "event", schema="eventsdb")
 @Data
 public class Event {
 	

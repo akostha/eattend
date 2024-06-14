@@ -1,0 +1,15 @@
+server:
+    port: 8082
+service:
+    qrservice:
+        url: ${QRSERVICE_URL}
+spring:
+    application:
+        name: eventservice
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: ${ETSERVICE_DB_PASSWORD}
+        url: ${ETSERVICE_DB_URL}
+        username: ${ETSERVICE_DB_USERNAME}
+images:
+    basepath: /home/ajay/devl/docs

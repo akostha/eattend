@@ -2,7 +2,7 @@
 FROM openjdk:17-jdk-alpine
 
 # Set environment variables for database connection
-ENV ETSERVICE_DB_URL=jdbc:mysql://ajaykdbserver.c7s8seeiu4fl.us-east-1.rds.amazonaws.com:3306/qrtemplates
+ENV ETSERVICE_DB_URL=jdbc:mysql://ajaykdbserver.c7s8seeiu4fl.us-east-1.rds.amazonaws.com:3306/devldb
 ENV ETSERVICE_DB_USERNAME=admin
 ENV ETSERVICE_DB_PASSWORD=BARB0INDRAP
 
